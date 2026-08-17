@@ -1,5 +1,7 @@
 
 import sys
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 from enum import IntEnum
 from typing import Any
 try:
