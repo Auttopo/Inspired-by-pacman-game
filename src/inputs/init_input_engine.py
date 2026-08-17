@@ -129,6 +129,8 @@ class InitInputEngine:
                     -1,
                     s2.SDL_RENDERER_ACCELERATED
             )
+            if not self.renderer:
+                raise
         except Exception:
             print("can't load gpu, loading on cpu")
             self.renderer = s2.SDL_CreateRenderer(
