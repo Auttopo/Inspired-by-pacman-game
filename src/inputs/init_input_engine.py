@@ -2,6 +2,7 @@
 import sys
 import os
 os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["SDL_AUDIODRIVER"] = "dummy"
 from enum import IntEnum
 from typing import Any
 try:
