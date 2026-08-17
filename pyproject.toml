@@ -1,0 +1,11 @@
+[project]
+name = "Pacman"
+version = "0.1.0"
+description = "The game Pacman reconstitued in python3"
+requires-python = "==3.13.*"
+dependencies = [
+	"flake8",
+	"mypy",
+	"pysdl2",
+	"pysdl2-dll",
+]
