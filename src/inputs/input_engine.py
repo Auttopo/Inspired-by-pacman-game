@@ -4,7 +4,6 @@ from inputs.input_sdl_engine import SDLCoreEngine
 from typing import Callable, Iterator
 import threading
 
-GAME_SERVER_MUTEX = threading.Lock()
 
 class InputEngine(InputProcesses, SDLCoreEngine):
     """
@@ -13,7 +12,6 @@ class InputEngine(InputProcesses, SDLCoreEngine):
     def create_frames_generator(self) -> Callable[..., Iterator[bytes]]:
 
         def generate_http_frames():
-            GAME_SERVER_MUTEX.acquire()
             gen = self.process_core_while()
             try:
                 while 1:
@@ -26,6 +24,5 @@ class InputEngine(InputProcesses, SDLCoreEngine):
                 raise
             finally:
                 self.free_all()
-                GAME_SERVER_MUTEX.release()
 
         return generate_http_frames
