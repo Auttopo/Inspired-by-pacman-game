@@ -195,5 +195,5 @@ class SDLCoreEngine(InitInputEngine):
             limit_fps(start_frame, fps_limit)
             if res:
                 return res
-            yield self.get_video_data(self.renderer, self.width, self.height)
+            yield get_video_data(self.renderer, self.width, self.height)
         return ""
