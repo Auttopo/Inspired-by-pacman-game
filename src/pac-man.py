@@ -1,5 +1,6 @@
 
 import sys
+import threading
 from inputs.input_engine import InputEngine
 import sdl2 as s2
 import json
@@ -83,11 +84,13 @@ if __name__ == "__main__":
         host = sys.argv[3]
 
     try:
+        mutex = threading.Lock()
 
         @server_app.route("/stream")
         def stream_game():
             game = InputEngine(sys.argv[1])
             game.init_game()
+            game.mutex = mutex
             frame_gen = game.create_frames_generator()
             return Response(
                         frame_gen(),
@@ -99,9 +102,9 @@ if __name__ == "__main__":
                 data = websocket.receive()
                 if data is None:
                     break
-                game.mutex.acquire()
+                mutex.acquire()
                 event_mapping(json.loads(data))
-                game.mutex.release()
+                mutex.release()
 
         server_app.run(host=host, port=port, threaded=True)
 
