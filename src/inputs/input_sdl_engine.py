@@ -40,6 +40,10 @@ def void_func(*args: Any, **kwargs: Any) -> str:
 
 def get_video_data(renderer: Any, w: int, h: int) -> bytes:
 
+    wc, hc = ctypes.c_int(), ctypes.c_int()
+    s2.SDL_GetRendererOutputSize(renderer, ctypes.byref(wc), ctypes.byref(hc))
+    w, h = wc.value, hc.value
+
     pixels = ctypes.create_string_buffer(w * h * 4)
     ret = s2.SDL_RenderReadPixels(
                             renderer, None,
@@ -172,6 +176,7 @@ class SDLCoreEngine(InitInputEngine):
                         if event.window.event == s2.SDL_WINDOWEVENT_RESIZED:
                             w = event.window.data1
                             h = event.window.data2
+                            s2.SDL_SetWindowSize(self.window, w, h)
                             self.midxy[0] = int(w / 2)
                             self.midxy[1] = int(h / 2)
                             self.width = w
