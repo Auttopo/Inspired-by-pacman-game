@@ -87,7 +87,7 @@ class SDLCoreEngine(InitInputEngine):
                     yi = next(gen)
                     yield yi
             except StopIteration as e:
-                ret = e
+                res = e
             if res == "confirm_quit":
                 if self.previous not in {"menu", "escape", "end"}:
                     res = "menu"
