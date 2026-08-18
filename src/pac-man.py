@@ -7,9 +7,23 @@ server_app = Flask(__name__)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Error. Usage : python3 pac-man.py config.json")
+    port = 8042
+    host = "0.0.0.0"
+    if len(sys.argv) < 2 or len(sys.argv) > 4:
+        print(
+            "Error. Usage : python3 pac-man.py "
+            "config.json optional:port optional:host",
+            file=sys.stderr)
         sys.exit(1)
+    if len(sys.argv) > 2:
+        try:
+            port = int(sys.argv[2])
+        except:
+            print("Error : port need to be integer", file=sys.stderr)
+            sys.exit(1)
+    if len(sys.argv) > 3:
+        host = sys.argv[3]
+
     try:
         game = InputEngine(sys.argv[1])
         game.init_game()
@@ -20,7 +34,7 @@ if __name__ == "__main__":
             return Response(
                         frame_gen(),
                         mimetype="multipart/x-mixed-replace; boundary=frame")
-        server_app.run(host="0.0.0.0", port=8000, threaded=True)
+        server_app.run(host=host, port=port, threaded=True)
 
     except KeyboardInterrupt:
         print("program killed from keyboard", file=sys.stderr)
