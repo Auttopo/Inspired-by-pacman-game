@@ -17,7 +17,7 @@ class InputEngine(InputProcesses, SDLCoreEngine):
                     yield(
                         b"--frame\r\n"
                         b"Content-Type: image/jpeg\r\n\r\n"
-                        + jpeg_bytes + b"\r\n")
+                        + yi + b"\r\n")
             except Exception:
                 raise
             finally:
