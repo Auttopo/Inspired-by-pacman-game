@@ -1,10 +1,64 @@
 
 import sys
 from inputs.input_engine import InputEngine
+import sdl2 as s2
+import json
 from flask import Flask, Response
 from flask_sock import Sock
 server_app = Flask(__name__)
 route_app = Sock(server_app)
+
+
+def event_mapping(inputs: dict[str, str]):
+
+    match inputs["type"]:
+        case "mouseup":
+            event = s2.SDL_Event()
+            event.type = s2.SDL_MOUSEBUTTONUP
+            if inputs["button"] == 0:
+                event.button.button = s2.SDL_BUTTON_LEFT
+                event.button.x = inputs["x"]
+                event.button.y = inputs["y"]
+                s2.SDL_PushEvent(event)
+
+        case "keydown":
+            event = s2.SDL_Event()
+            event.type = s2.SDL_KEYDOWN
+            match inputs["key"]:
+                case "w" | "ArrowUp":
+                    event.key.keysym.sym = s2.SDLK_UP
+                    s2.SDL_PushEvent(event)
+                case "d" | "ArrowRight":
+                    event.key.keysym.sym = s2.SDLK_RIGHT
+                    s2.SDL_PushEvent(event)
+                case "s" | "ArrowDown":
+                    event.key.keysym.sym = s2.SDLK_DOWN
+                    s2.SDL_PushEvent(event)
+                case "a" | "ArrowLeft":
+                    event.key.keysym.sym = s2.SDLK_LEFT
+                    s2.SDL_PushEvent(event)
+                case "Escape":
+                    event.key.keysym.sym = s2.SDLK_ESCAPE
+                    s2.SDL_PushEvent(event)
+                case "/":
+                    event.key.keysym.sym = s2.SDLK_SLASH
+                    s2.SDL_PushEvent(event)
+                case "Enter":
+                    event.key.keysym.sym = s2.SDLK_RETURN
+                    s2.SDL_PushEvent(event)
+
+            event2 = s2.SDL_Event()
+            event2.type = s2.SDL_TEXTINPUT
+            event2.text.text = inputs["key"].encode("utf-8")
+            s2.SDL_PushEvent(event2)
+
+        case "resize":
+            event = s2.SDL_Event()
+            event.type = s2.SDL_WINDOWEVENT
+            event.window.event = s2.SDL_WINDOWEVENT_RESIZED:
+            event.window.data1 = inputs["width"]
+            event.window.data2 = inputs["height"]
+            s2.SDL_PushEvent(event)
 
 
 if __name__ == "__main__":
@@ -42,7 +96,7 @@ if __name__ == "__main__":
                 data = websocket.receive()
                 if data is None:
                     break
-                print(data)
+                event_mapping(json.loads(data))
 
         server_app.run(host=host, port=port, threaded=True)
 
