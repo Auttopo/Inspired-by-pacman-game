@@ -11,4 +11,5 @@ dependencies = [
 	"numpy",
 	"Pillow",
 	"flask",
+	"flask-sock",
 ]
