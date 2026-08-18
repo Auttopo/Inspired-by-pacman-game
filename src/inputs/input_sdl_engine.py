@@ -1,8 +1,13 @@
 
 import sys
 import random
-from typing import Any, Callable
+from typing import Any, Callable, Generator
 try:
+    import ctypes
+    import io
+    import numpy as np
+    from PIL import Image
+
     import sdl2 as s2
 except ImportError as e:
     print(f"Error : missing library ({e.name}).")
@@ -33,6 +38,23 @@ def void_func(*args: Any, **kwargs: Any) -> str:
     return ""
 
 
+def get_video_data(renderer: Any, w: int, h: int) -> bytes:
+    global JPEG_BYTES
+
+    pixels = ctypes.create_string_buffer(w * h * 4)
+    ret = s2.SDL_RenderReadPixels(
+                            renderer, None,
+                            s2.SDL_PIXELFORMAT_RGBA32,
+                            pixels, w * 4)
+    if ret != 0:
+        raise Exception("RenderReadPixels failded")
+    arr = np.frombuffer(pixels, dtype=np.uint8).reshape(h, w, 4)
+    img = Image.fromarray(arr, "RGBA").convert("RGB")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=70)
+    return buf.getvalue()
+
+
 class SDLCoreEngine(InitInputEngine):
     """
     The core engine responsible for running the game loop and state machine.
@@ -40,7 +62,7 @@ class SDLCoreEngine(InitInputEngine):
     the transitions between the menu, gameplay, pause, and end screens.
     """
 
-    def process_core_while(self) -> None:
+    def process_core_while(self) -> Generator[bytes, None, None]:
         """
         The main state machine of the game.
         Loops indefinitely until the 'exit' command is received. It sets up
@@ -56,11 +78,17 @@ class SDLCoreEngine(InitInputEngine):
         while game:
             if res != "confirm_quit":
                 self.previous = res
-            res = self.core_while(
+            gen = self.core_while(
                     mouse_event,
                     key_event,
                     display
                     )
+            try:
+                while 1:
+                    yi = next(gen)
+                    yield yi
+            except StopIteration as e:
+                ret = e
             if res == "confirm_quit":
                 if self.previous not in {"menu", "escape", "end"}:
                     res = "menu"
@@ -122,7 +150,7 @@ class SDLCoreEngine(InitInputEngine):
                 mousebuttonup: Callable[..., str],
                 keydown: Callable[..., str],
                 display:  Callable[..., str]
-                ) -> str:
+                ) -> Generator[bytes, None, str]:
         """
         The frame-by-frame execution loop for the current game state.
         Polls for SDL2 events (window resize, quit, mouse, keyboard, text)"""
@@ -144,6 +172,8 @@ class SDLCoreEngine(InitInputEngine):
                             h = event.window.data2
                             self.midxy[0] = int(w / 2)
                             self.midxy[1] = int(h / 2)
+                            self.width = w
+                            self.height = h
                             self.set_cell_size(w, h)
 
                     case s2.SDL_MOUSEBUTTONUP:
@@ -165,4 +195,5 @@ class SDLCoreEngine(InitInputEngine):
             limit_fps(start_frame, fps_limit)
             if res:
                 return res
+            yield self.get_video_data(self.renderer, self.width, self.height)
         return ""

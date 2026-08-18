@@ -1,6 +1,10 @@
 
 import sys
 from inputs.input_engine import InputEngine
+from flask import Flask, Response
+server_app = Flask(__name__)
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -9,7 +13,15 @@ if __name__ == "__main__":
     try:
         game = InputEngine(sys.argv[1])
         game.init_game()
-        game.process_game()
+        frame_gen = game.create_frames_generator()
+
+        @server_app.route("/stream")
+        def stream_game():
+            return Response(
+                        frame_gen(),
+                        mimetype="multipart/x-mixed-replace; boundary=frame")
+        server_app.run(host="0.0.0.0", port=8000, threaded=True)
+
     except KeyboardInterrupt:
         print("program killed from keyboard", file=sys.stderr)
     except Exception as e:

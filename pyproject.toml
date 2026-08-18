@@ -8,4 +8,7 @@ dependencies = [
 	"mypy",
 	"pysdl2",
 	"pysdl2-dll",
+	"numpy",
+	"PIL",
+	"flask",
 ]
