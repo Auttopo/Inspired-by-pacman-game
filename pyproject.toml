@@ -9,6 +9,6 @@ dependencies = [
 	"pysdl2",
 	"pysdl2-dll",
 	"numpy",
-	"PIL",
+	"Pillow",
 	"flask",
 ]
