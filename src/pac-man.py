@@ -11,6 +11,7 @@ route_app = Sock(server_app)
 
 def event_mapping(inputs: dict[str, str]):
 
+    print(inputs)
     match inputs["type"]:
         case "mouseup":
             event = s2.SDL_Event()
