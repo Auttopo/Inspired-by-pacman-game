@@ -55,7 +55,7 @@ def event_mapping(inputs: dict[str, str]):
         case "resize":
             event = s2.SDL_Event()
             event.type = s2.SDL_WINDOWEVENT
-            event.window.event = s2.SDL_WINDOWEVENT_RESIZED:
+            event.window.event = s2.SDL_WINDOWEVENT_RESIZED
             event.window.data1 = inputs["width"]
             event.window.data2 = inputs["height"]
             s2.SDL_PushEvent(event)
