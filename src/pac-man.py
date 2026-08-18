@@ -16,11 +16,13 @@ def event_mapping(inputs: dict[str, str]):
         case "mouseup":
             event = s2.SDL_Event()
             event.type = s2.SDL_MOUSEBUTTONUP
+            print("MOUSE")
             if inputs["button"] == 0:
                 event.button.button = s2.SDL_BUTTON_LEFT
                 event.button.x = inputs["x"]
                 event.button.y = inputs["y"]
                 s2.SDL_PushEvent(event)
+                print("UPSHED")
 
         case "keydown":
             event = s2.SDL_Event()
@@ -97,7 +99,9 @@ if __name__ == "__main__":
                 data = websocket.receive()
                 if data is None:
                     break
+                game.mutex.acquire()
                 event_mapping(json.loads(data))
+                game.mutex.release()
 
         server_app.run(host=host, port=port, threaded=True)
 

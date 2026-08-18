@@ -39,7 +39,6 @@ def void_func(*args: Any, **kwargs: Any) -> str:
 
 
 def get_video_data(renderer: Any, w: int, h: int) -> bytes:
-    global JPEG_BYTES
 
     pixels = ctypes.create_string_buffer(w * h * 4)
     ret = s2.SDL_RenderReadPixels(
@@ -97,6 +96,7 @@ class SDLCoreEngine(InitInputEngine):
             self.d.text = ""
             match res:
                 case "exit":
+                    self.mutex.release()
                     return
                 case "menu":
                     self.s.set_background_sound("menu_sound")
@@ -159,6 +159,8 @@ class SDLCoreEngine(InitInputEngine):
 
         fps_limit = self.fps_limit
         while game:
+            self.mutex.acquire()
+
             start_frame = s2.SDL_GetTicks()
 
             event = s2.SDL_Event()
@@ -195,5 +197,6 @@ class SDLCoreEngine(InitInputEngine):
             limit_fps(start_frame, fps_limit)
             if res:
                 return res
+            self.mutex.release()
             yield get_video_data(self.renderer, self.width, self.height)
         return ""

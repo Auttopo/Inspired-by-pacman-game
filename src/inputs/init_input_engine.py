@@ -1,6 +1,7 @@
 
 import sys
 import os
+import threading
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
 from enum import IntEnum
@@ -49,7 +50,8 @@ class InitInputEngine:
     def __init__(self, path: str) -> None:
         """
         Initializes the setup engine with basic configurations."""
-
+        
+        self.mutex = threading.Lock()
         self.fps_limit = 16  # 1000 ms / 60 frames = 16.666 fps
         self.midxy: list[int] = [int(D.w / 2), int(D.h / 2)]
         self.width = D.w
