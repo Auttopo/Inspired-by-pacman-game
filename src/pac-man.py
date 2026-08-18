@@ -2,8 +2,9 @@
 import sys
 from inputs.input_engine import InputEngine
 from flask import Flask, Response
+from flask_sock import Sock
 server_app = Flask(__name__)
-
+route_app = Sock(server_app)
 
 
 if __name__ == "__main__":
@@ -34,6 +35,15 @@ if __name__ == "__main__":
             return Response(
                         frame_gen(),
                         mimetype="multipart/x-mixed-replace; boundary=frame")
+
+        @route_app.route("/inputs")
+        def stream_inputs(websocket):
+            while True:
+                data = websocket.receive()
+                if data is None:
+                    break
+                print(data)
+
         server_app.run(host=host, port=port, threaded=True)
 
     except KeyboardInterrupt:
