@@ -83,12 +83,12 @@ if __name__ == "__main__":
         host = sys.argv[3]
 
     try:
-        game = InputEngine(sys.argv[1])
-        game.init_game()
-        frame_gen = game.create_frames_generator()
 
         @server_app.route("/stream")
         def stream_game():
+            game = InputEngine(sys.argv[1])
+            game.init_game()
+            frame_gen = game.create_frames_generator()
             return Response(
                         frame_gen(),
                         mimetype="multipart/x-mixed-replace; boundary=frame")
