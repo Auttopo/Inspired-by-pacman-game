@@ -87,7 +87,8 @@ class SDLCoreEngine(InitInputEngine):
                     yi = next(gen)
                     yield yi
             except StopIteration as e:
-                res = e
+                self.mutex.release()
+                res = str(e)
             if res == "confirm_quit":
                 if self.previous not in {"menu", "escape", "end"}:
                     res = "menu"
@@ -96,7 +97,6 @@ class SDLCoreEngine(InitInputEngine):
             self.d.text = ""
             match res:
                 case "exit":
-                    self.mutex.release()
                     return
                 case "menu":
                     self.s.set_background_sound("menu_sound")
@@ -197,6 +197,7 @@ class SDLCoreEngine(InitInputEngine):
             limit_fps(start_frame, fps_limit)
             if res:
                 return res
+            video_data = get_video_data(self.renderer, self.width, self.height)
             self.mutex.release()
-            yield get_video_data(self.renderer, self.width, self.height)
+            yield video_data
         return ""

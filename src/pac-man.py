@@ -12,18 +12,15 @@ route_app = Sock(server_app)
 
 def event_mapping(inputs: dict[str, str]):
 
-    print(inputs)
     match inputs["type"]:
         case "mouseup":
             event = s2.SDL_Event()
             event.type = s2.SDL_MOUSEBUTTONUP
-            print("MOUSE")
             if inputs["button"] == 0:
                 event.button.button = s2.SDL_BUTTON_LEFT
                 event.button.x = inputs["x"]
                 event.button.y = inputs["y"]
                 s2.SDL_PushEvent(event)
-                print("UPSHED")
 
         case "keydown":
             event = s2.SDL_Event()
@@ -84,14 +81,12 @@ if __name__ == "__main__":
         host = sys.argv[3]
 
     try:
-        mutex = threading.Lock()
+        game = InputEngine(sys.argv[1])
+        game.init_game()
+        frame_gen = game.create_frames_generator()
 
         @server_app.route("/stream")
         def stream_game():
-            game = InputEngine(sys.argv[1])
-            game.init_game()
-            game.mutex = mutex
-            frame_gen = game.create_frames_generator()
             return Response(
                         frame_gen(),
                         mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -100,13 +95,16 @@ if __name__ == "__main__":
         def stream_inputs(websocket):
             while True:
                 data = websocket.receive()
-                if data is None:
-                    break
-                mutex.acquire()
-                event_mapping(json.loads(data))
-                mutex.release()
-
-        server_app.run(host=host, port=port, threaded=True)
+                if data is not None:
+                    game.mutex.acquire()
+                    event_mapping(json.loads(data))
+                    game.mutex.release()
+        try:
+            server_app.run(host=host, port=port, threaded=True)
+        except Exception as e:
+            print(f"Server stopped with error {e}")
+        finally:
+            game.free_all()
 
     except KeyboardInterrupt:
         print("program killed from keyboard", file=sys.stderr)
