@@ -251,11 +251,13 @@ class DisplayGame(BaseDisplay):
 
         s2.SDL_RenderClear(self.renderer)
 
-        if self.score_trace != self.engine.score:
-            s2_mix.Mix_PlayChannel(
-                                -1,
-                                self.sounds[random.choice(self.eat_sounds)],
-                                0)
+        # DISABLED TO SAVE RESOURCES
+        #if self.score_trace != self.engine.score:
+        #    s2_mix.Mix_PlayChannel(
+        #                        -1,
+        #                        self.sounds[random.choice(self.eat_sounds)],
+        #                        0)
+
         self.score_trace = self.engine.score
 
         lives = self.player.lives
@@ -280,7 +282,10 @@ class DisplayGame(BaseDisplay):
         if self.player.lives != lives:
             self.start = False
             self.shake_death = self.midxy[0]
-            s2_mix.Mix_PlayChannel(-1, self.sounds["left_life_sound"], 0)
+            
+            # DISABLED TO SAVE RESOURCES
+            # s2_mix.Mix_PlayChannel(-1, self.sounds["left_life_sound"], 0)
+
 
         if self.pov_rpg:
             player_distx_0 = (self.cell * self.player.xf + self.cell / 2)

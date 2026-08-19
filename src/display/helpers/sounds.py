@@ -35,6 +35,9 @@ class Sounds:
         """
         Loads all WAV files specified in SOUNDS_PATH into memory.
         The sounds are stored in the self.sounds """
+
+        return  # DISABLED TO SAVE RESOURCES
+
         for elem in SOUNDS_PATH[1:]:
             path = f"{SOUNDS_PATH[0]}{elem}"
             chunk = s2_mix.Mix_LoadWAV(path.encode())
@@ -49,6 +52,9 @@ class Sounds:
         Frees the memory allocated for all loaded sound chunks and
         properly shuts down the SDL2 mixer audio subsystem.
         """
+
+        return  # DISABLED TO SAVE RESOURCES
+
         for key, elem in self.sounds.items():
             s2_mix.Mix_FreeChunk(elem)
         s2_mix.Mix_CloseAudio()
@@ -57,6 +63,9 @@ class Sounds:
     def set_background_sound(self, name: str, loop: int = -1) -> None:
         """
         Plays or resumes a specific background sound/music"""
+
+        return  # DISABLED TO SAVE RESOURCES
+
         if not self.is_active:
             self.channel = s2_mix.Mix_PlayChannel(-1, self.sounds[name], loop)
             self.active = name
@@ -75,12 +84,18 @@ class Sounds:
         Pauses the currently playing background sound channel
         The sound can be resumed later
         """
+
+        return  # DISABLED TO SAVE RESOURCES
+
         if self.active:
             s2_mix.Mix_Pause(self.channel)
 
     def music_off_background_sound(self, mode: bool) -> None:
         """
         Toggles the global background music state (muted or unmuted)."""
+
+        return  # DISABLED TO SAVE RESOURCES
+
         self.music_off = mode
         if self.is_active:
             if mode:
