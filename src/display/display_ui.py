@@ -75,9 +75,9 @@ class DisplayUI(BaseDisplay):
         s2.SDL_RenderCopy(self.renderer, self.t['menu_instructions'],
                           None, dst)
 
-        dst = s2.SDL_Rect(int(self.midxy[0] - ((w - 100) / 2)),
-                          jump + pading * 4, w - 100, h - 80)
-        s2.SDL_RenderCopy(self.renderer, self.t['menu_exit'], None, dst)
+#        dst = s2.SDL_Rect(int(self.midxy[0] - ((w - 100) / 2)),
+#                          jump + pading * 4, w - 100, h - 80)
+#        s2.SDL_RenderCopy(self.renderer, self.t['menu_exit'], None, dst)
 
         self.draw_music_status()
 

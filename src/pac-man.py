@@ -6,6 +6,8 @@ import sdl2 as s2
 import json
 from flask import Flask, Response
 from flask_sock import Sock
+
+
 server_app = Flask(__name__)
 route_app = Sock(server_app)
 
@@ -25,7 +27,8 @@ def event_mapping(inputs: dict[str, str]):
         case "keydown":
             event = s2.SDL_Event()
             event.type = s2.SDL_KEYDOWN
-            match inputs["key"]:
+            c = inputs["key"]
+            match c:
                 case "w" | "ArrowUp":
                     event.key.keysym.sym = s2.SDLK_UP
                     s2.SDL_PushEvent(event)
@@ -47,11 +50,15 @@ def event_mapping(inputs: dict[str, str]):
                 case "Enter":
                     event.key.keysym.sym = s2.SDLK_RETURN
                     s2.SDL_PushEvent(event)
+                case "Backspace":
+                    event.key.keysym.sym = s2.SDLK_BACKSPACE
+                    s2.SDL_PushEvent(event)
 
-            event2 = s2.SDL_Event()
-            event2.type = s2.SDL_TEXTINPUT
-            event2.text.text = inputs["key"].encode("utf-8")
-            s2.SDL_PushEvent(event2)
+            if len(c) == 1 and 126 >= ord(c) >= 32:
+                event2 = s2.SDL_Event()
+                event2.type = s2.SDL_TEXTINPUT
+                event2.text.text = c.encode("utf-8")[:31]
+                s2.SDL_PushEvent(event2)
 
         case "resize":
             event = s2.SDL_Event()
@@ -87,6 +94,8 @@ if __name__ == "__main__":
 
         @server_app.route("/stream")
         def stream_game():
+            if not game.stream_mutex.acquire(blocking=False):
+                return Response("Stream already in use", status=409, mimetype="text/plain")
             return Response(
                         frame_gen(),
                         mimetype="multipart/x-mixed-replace; boundary=frame")

@@ -116,10 +116,10 @@ class InputProcesses(InitInputEngine):
         inside = {"lu": (x_lu, y_lu), "rd": (x_rd, y_rd)}
         data.update({"instructions": inside})
 
-        y_lu = jump + pading * 4
-        y_rd = y_lu + h
-        inside = {"lu": (x_lu, y_lu), "rd": (x_rd, y_rd)}
-        data.update({"confirm_quit": inside})
+#        y_lu = jump + pading * 4
+#        y_rd = y_lu + h
+#        inside = {"lu": (x_lu, y_lu), "rd": (x_rd, y_rd)}
+#        data.update({"confirm_quit": inside})
 
         return data
 

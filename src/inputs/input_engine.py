@@ -2,10 +2,7 @@
 from inputs.input_process import InputProcesses
 from inputs.input_sdl_engine import SDLCoreEngine
 from typing import Callable, Iterator
-import threading
-from flask import Response
 
-STREAM_MUTEX = threading.Lock()
 
 class InputEngine(InputProcesses, SDLCoreEngine):
     """
@@ -15,9 +12,6 @@ class InputEngine(InputProcesses, SDLCoreEngine):
         gen = self.process_core_while()
 
         def generate_http_frames():
-            global STREAM_MUTEX
-            if not STREAM_MUTEX.acquire(blocking=False):
-                return Response("Stream already in use", status=409, mimetype="text/plain")
             try:
                 while 1:
                     yi = next(gen)
@@ -28,6 +22,6 @@ class InputEngine(InputProcesses, SDLCoreEngine):
             except Exception as e:
                 print(f"Unexpected error ! : {e}")
             finally:
-                STREAM_MUTEX.release()
+                self.stream_mutex.release()
 
         return generate_http_frames

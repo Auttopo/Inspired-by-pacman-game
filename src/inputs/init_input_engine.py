@@ -52,6 +52,7 @@ class InitInputEngine:
         Initializes the setup engine with basic configurations."""
         
         self.mutex = threading.Lock()
+        self.stream_mutex = threading.Lock()
         self.fps_limit = 16  # 1000 ms / 60 frames = 16.666 fps
         self.midxy: list[int] = [int(D.w / 2), int(D.h / 2)]
         self.width = D.w
